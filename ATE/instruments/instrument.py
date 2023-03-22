@@ -39,7 +39,7 @@ class Instrument():
         return self._resource.read()
     
     def _qr(self, dat: str = ''):
-        return self._resource.query(dat)
+        return self._resource.query(dat).strip()
 
 ## demo ##
 # list all connected instruments
