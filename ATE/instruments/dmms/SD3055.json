@@ -1,0 +1,24 @@
+{
+    "*RST": null,
+    "*CLS": null,
+    "*IDN?": null,
+    "ABORt": null,
+    "FETCh?": null,
+    "INITiate:IMMediate": null,
+    "OUTPut:TRIGger:SLOPe": null,
+    "R?": null,
+    "READ?": null,
+    "SAMPle:COUNt": null,
+    "UNIT:TEMPerature": null,
+    "CALCulate": {
+        "CLEar:[IMMediate]": null,
+        "LIMit": {
+            "LOWer[:DATA]": null,
+            "UPPer[:DATA]": null,
+            "STATe": null
+        },
+        "TRANsform:HISTogram": {
+
+        } 
+    }
+}
