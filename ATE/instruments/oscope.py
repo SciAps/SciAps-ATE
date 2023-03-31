@@ -2,8 +2,12 @@
 import pyvisa
 # import easy_scpi as scpi
 
+import numpy as np
+
 from time import sleep
 from csv import writer
+from struct import unpack
+
 
 ## oscope class ##
 # class Oscope(scpi.Instrument):
@@ -71,18 +75,35 @@ class Oscope():
         self._wr(':ACQUIRE:COMPLETE 100')
         self._wr(':DIGITIZE CHANNEL1')
 
-    def screenshot(self, fname: str) -> None:
-        self._wr(':DISPLAY:DATA? PNG, SCREEN, COLOR')
-        dat = self._inst.read_raw()
+    def screenshot(self, fname: str = 'scope.png') -> None:
+        dat = self._inst.query_binary_values(
+            ':DISPLAY:DATA? PNG, SCREEN, COLOR',
+            datatype='B',
+            is_big_endian=False,
+            container=bytearray)
         with open(fname, 'wb') as f:
             f.write(dat)
 
-        # self._wr(':WAVEFORM:FORMAT ASCII')
-        # print(self._wr(':HARDCOPY:PRINTER:LIST?'))
+    def read_preamble(self, channel = 1) -> dict:
+        self._wr(f':WAVEFORM:SOURCE CHAN{channel}')
+        dat = self._inst.query_ascii_values(':WAVEFORM:PREAMBLE?')
 
-    # def label(self, lbls : [str]) -> None:
-    #     for lbl in lbls:
-    #         self._inst.write(f'{}\n')
+        keys = ['format', 'type', 'points', 'count', 'xincrement', 'xorigin', 'xreference', 'yincrement', 'yorigin', 'yreference']
+
+        return dict(zip(keys, dat))
+        
+
+    def read_data(self, channel = 1) -> list[float]:
+        self._wr(f':WAVEFORM:SOURCE CHAN{channel}')
+        self._wr(f':WAVEFORM:POINTS 1000')
+        self._wr(f':WAVEFORM:FORMAT ASCII')
+        self._wr(f':WAVEFORM:UNSIGNED 0')
+        dat = self._inst.query(':WAVEFORM:DATA?').split(',')
+        
+        # dat[0] = dat[0].split(' ')[-1]      # remove header from first value
+        dat[0] = dat[0][10:]
+        dat = [float(d) for d in dat]
+        return dat
 
 
     ## scpi commands ##
